@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #taskInput {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        #taskList {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> <!-- Using a CDN  -->
+</head>
+<body>
+    <div id="app"> 
+        <h2>To-Do List</h2>
+
+        <div>
+            <input type="text" v-model="newTask" id="taskInput" placeholder="Add a new task">
+            <button @click="addTask">Add</button>
+        </div>
+
+        <ul id="taskList">
+            <li v-for="(task, index) in tasks" :key="index">
+                <input type="checkbox" v-model="task.completed" @change="toggleCompletion(index)">
+                <span :class="{ completed: task.completed }">{{ task.text }}</span>
+                <button @click="deleteTask(index)">Delete</button>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app', // HTML ID 
+            data: {
+                newTask: '',
+                tasks: []
+            },
+            mounted() {
+                // Load tasks 
+                this.loadTasks();
+            },
+            methods: {
+                addTask() {
+                    // Add new task 
+                    this.tasks.push({
+                        text: this.newTask,
+                        completed: false
+                    });
+
+                    // Save update 
+                    this.saveTasks();
+
+                    // Clear input field
+                    this.newTask = '';
+                },
+                loadTasks() {
+                    // Get tasks or initialize an empty array
+                    this.tasks = JSON.parse(localStorage.getItem('vueTasks')) || [];
+                },
+                toggleCompletion(index) {
+                    // Toggle the completed status of the selected task
+                    this.tasks[index].completed = !this.tasks[index].completed;
+
+                    // Save update
+                    this.saveTasks();
+                },
+                deleteTask(index) {
+                    // Remove the selected task 
+                    this.tasks.splice(index, 1);
+
+                    // Save update
+                    this.saveTasks();
+                },
+                saveTasks() {
+                    // Save update
+                    localStorage.setItem('vueTasks', JSON.stringify(this.tasks));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
